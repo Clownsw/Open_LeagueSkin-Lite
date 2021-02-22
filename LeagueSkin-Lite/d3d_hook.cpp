@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <mutex>
+#include <fstream>
 
 #include <d3d9.h>
 #include <d3d11.h>
@@ -120,21 +121,25 @@ inline bool exists_test1(const std::string& name) {
 	}
 }
 
-const char* Fonts_File(void)
+auto If_Version(void) -> const char*
 {
-	std::string file_1 = "C:\\WINDOWS\\FONTS\\MSYH.TTC";
-	std::string file_2 = "C:\\WINDOWS\\FONTS\\MSYH.TTC";
+	const char* Win7_Fonts_File = "C:\\Windows\\Fonts\\msyh.ttf";
+	const char* Win10_Fonts_File = "C:\\Windows\\Fonts\\msyh.ttc";
 
-	if (exists_test1(file_1))
-	{
-		return (const char*)file_1.c_str();
-	}
-	if (exists_test1(file_2))
-	{
-		return (const char*)file_2.c_str();
-	}
+	std::ifstream Find(Win7_Fonts_File);
 
-	return nullptr;
+	if (!Find)
+	{
+		Find.close();
+
+		return Win10_Fonts_File;
+	}
+	else
+	{
+		Find.close();
+
+		return Win7_Fonts_File;
+	}
 }
 
 namespace d3d_vtable {
@@ -157,7 +162,7 @@ namespace d3d_vtable {
 
 		ImGui::GetIO( ).ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
-		ImGui::GetIO().Fonts->AddFontFromFileTTF(Fonts_File(), 17, NULL, ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
+		ImGui::GetIO().Fonts->AddFontFromFileTTF(If_Version(), 17, NULL, ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
 
 		ImGui_ImplWin32_Init( *reinterpret_cast<HWND*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Riot__g_window ) );
 
